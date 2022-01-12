@@ -1,0 +1,16 @@
+type: google.api.Service
+config_version: 3
+
+http:
+  rules:
+    - selector: auth.v1.AuthService.CreateAccount
+      post: /v1/accounts
+      body: "*"
+    - selector: auth.v1.AuthService.UpdateAccount
+      put: /v1/accounts/{id}
+      body: "*"
+    - selector: auth.v1.AuthService.ChangePassword
+      post: /v1/accounts/{id}/password
+      body: "*"
+    - selector: auth.v1.AuthService.GetAccount
+      get: /v1/accounts/{id}

@@ -1,0 +1,50 @@
+syntax = "proto3";
+package auth.v1;
+option go_package="coolcar/account/api/gen/v1;authpb";
+
+message CreateAccountRequest {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+    string comfirm_password = 4;
+}
+
+message CreateAccountResponse {}
+
+message UpdateAccountRequest {
+    string id = 1;
+    string username = 2;
+    string email = 3;
+}
+
+message UpdateAccountResponse {}
+
+message ChangePasswordRequest {
+    string id = 1;
+    string password = 2;
+    string comfirm_password = 3;
+}
+
+message ChangePasswordResponse {}
+
+message Account {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+}
+
+message AccountEntity {
+    string id = 1;
+    Account account = 2;
+}
+
+message GetAccountRequest {
+    string id = 1;
+}
+
+service AuthService {
+    rpc CreateAccount(CreateAccountRequest) returns (AccountEntity);
+    rpc GetAccount(GetAccountRequest) returns (Account);
+    rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse);
+    rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+}

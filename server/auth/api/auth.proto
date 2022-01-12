@@ -1,0 +1,30 @@
+syntax = "proto3";
+package auth.v1;
+option go_package="coolcar/auth/api/gen/v1;authpb";
+
+message LoginRequest {
+    string email = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+    int32 expires_in = 3;
+}
+
+
+message RefreshLoginRequest {
+    string refresh_token = 1;
+}
+
+message RefreshLoginResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+    int32 expires_in = 3;
+}
+
+service AuthService {
+    rpc Login (LoginRequest) returns (LoginResponse);
+    rpc Refresh(RefreshLoginRequest) returns (RefreshLoginResponse);
+}
