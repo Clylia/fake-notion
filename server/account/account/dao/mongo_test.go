@@ -24,7 +24,7 @@ func TestAccountLifecycle(t *testing.T) {
 		t.Fatalf("cannot setup indexes: %v", err)
 	}
 	m := NewMongo(db)
-	account := &AccountRecord{
+	account := AccountRecord{
 		Account: &accountpb.Account{
 			Email:    "test@gmail.com",
 			Username: "test",
@@ -39,7 +39,7 @@ func TestAccountLifecycle(t *testing.T) {
 		{
 			name: "add_account_should_success",
 			op: func() error {
-				a, err := m.CreateAccount(context.Background(), account)
+				a, err := m.CreateAccount(context.Background(), &account)
 				if err != nil {
 					return err
 				}
@@ -52,10 +52,22 @@ func TestAccountLifecycle(t *testing.T) {
 				if a.Account.Password != account.Account.Password {
 					return fmt.Errorf("create account passowrd [%v] but got [%v]", account.Account.Password, a.Account.Password)
 				}
-				account = a
+				account = *a
 				return nil
 			},
 			wantErr: false,
+		},
+		{
+			name: "add_account_again_should_fail",
+			op: func() error {
+				again := account
+				_, err := m.CreateAccount(context.Background(), &again)
+				if err != nil {
+					return err
+				}
+				return nil
+			},
+			wantErr: true,
 		},
 		{
 			name: "get_account_should_success",
