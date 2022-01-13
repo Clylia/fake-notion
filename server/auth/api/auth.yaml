@@ -9,6 +9,3 @@ http:
     - selector: auth.v1.AuthService.Refresh
       post: /v1/auth/refresh
       body: "*"
-    - selector: auth.v1.AuthService.ChangePassword
-      post: /v1/auth/change-password
-      body: "*"

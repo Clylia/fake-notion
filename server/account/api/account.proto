@@ -1,6 +1,6 @@
 syntax = "proto3";
-package auth.v1;
-option go_package="coolcar/account/api/gen/v1;authpb";
+package account.v1;
+option go_package="coolcar/account/api/gen/v1;accountpb";
 
 message CreateAccountRequest {
     string username = 1;
@@ -22,7 +22,6 @@ message UpdateAccountResponse {}
 message ChangePasswordRequest {
     string id = 1;
     string password = 2;
-    string comfirm_password = 3;
 }
 
 message ChangePasswordResponse {}
@@ -35,16 +34,17 @@ message Account {
 
 message AccountEntity {
     string id = 1;
-    Account account = 2;
+    string username = 2;
+    string email = 3;
 }
 
 message GetAccountRequest {
     string id = 1;
 }
 
-service AuthService {
+service AccountService {
     rpc CreateAccount(CreateAccountRequest) returns (AccountEntity);
-    rpc GetAccount(GetAccountRequest) returns (Account);
+    rpc GetAccount(GetAccountRequest) returns (AccountEntity);
     rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse);
     rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
 }

@@ -4,7 +4,7 @@
 // - protoc             v3.15.6
 // source: account.proto
 
-package authpb
+package accountpb
 
 import (
 	context "context"
@@ -18,194 +18,194 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// AuthServiceClient is the client API for AuthService service.
+// AccountServiceClient is the client API for AccountService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AuthServiceClient interface {
+type AccountServiceClient interface {
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*AccountEntity, error)
-	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*Account, error)
+	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*AccountEntity, error)
 	UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...grpc.CallOption) (*UpdateAccountResponse, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
 }
 
-type authServiceClient struct {
+type accountServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
-	return &authServiceClient{cc}
+func NewAccountServiceClient(cc grpc.ClientConnInterface) AccountServiceClient {
+	return &accountServiceClient{cc}
 }
 
-func (c *authServiceClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*AccountEntity, error) {
+func (c *accountServiceClient) CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*AccountEntity, error) {
 	out := new(AccountEntity)
-	err := c.cc.Invoke(ctx, "/auth.v1.AuthService/CreateAccount", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/account.v1.AccountService/CreateAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*Account, error) {
-	out := new(Account)
-	err := c.cc.Invoke(ctx, "/auth.v1.AuthService/GetAccount", in, out, opts...)
+func (c *accountServiceClient) GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*AccountEntity, error) {
+	out := new(AccountEntity)
+	err := c.cc.Invoke(ctx, "/account.v1.AccountService/GetAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...grpc.CallOption) (*UpdateAccountResponse, error) {
+func (c *accountServiceClient) UpdateAccount(ctx context.Context, in *UpdateAccountRequest, opts ...grpc.CallOption) (*UpdateAccountResponse, error) {
 	out := new(UpdateAccountResponse)
-	err := c.cc.Invoke(ctx, "/auth.v1.AuthService/UpdateAccount", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/account.v1.AccountService/UpdateAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authServiceClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
+func (c *accountServiceClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
 	out := new(ChangePasswordResponse)
-	err := c.cc.Invoke(ctx, "/auth.v1.AuthService/ChangePassword", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/account.v1.AccountService/ChangePassword", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AuthServiceServer is the server API for AuthService service.
-// All implementations must embed UnimplementedAuthServiceServer
+// AccountServiceServer is the server API for AccountService service.
+// All implementations must embed UnimplementedAccountServiceServer
 // for forward compatibility
-type AuthServiceServer interface {
+type AccountServiceServer interface {
 	CreateAccount(context.Context, *CreateAccountRequest) (*AccountEntity, error)
-	GetAccount(context.Context, *GetAccountRequest) (*Account, error)
+	GetAccount(context.Context, *GetAccountRequest) (*AccountEntity, error)
 	UpdateAccount(context.Context, *UpdateAccountRequest) (*UpdateAccountResponse, error)
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
-	mustEmbedUnimplementedAuthServiceServer()
+	mustEmbedUnimplementedAccountServiceServer()
 }
 
-// UnimplementedAuthServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedAuthServiceServer struct {
+// UnimplementedAccountServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedAccountServiceServer struct {
 }
 
-func (UnimplementedAuthServiceServer) CreateAccount(context.Context, *CreateAccountRequest) (*AccountEntity, error) {
+func (UnimplementedAccountServiceServer) CreateAccount(context.Context, *CreateAccountRequest) (*AccountEntity, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccount not implemented")
 }
-func (UnimplementedAuthServiceServer) GetAccount(context.Context, *GetAccountRequest) (*Account, error) {
+func (UnimplementedAccountServiceServer) GetAccount(context.Context, *GetAccountRequest) (*AccountEntity, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccount not implemented")
 }
-func (UnimplementedAuthServiceServer) UpdateAccount(context.Context, *UpdateAccountRequest) (*UpdateAccountResponse, error) {
+func (UnimplementedAccountServiceServer) UpdateAccount(context.Context, *UpdateAccountRequest) (*UpdateAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateAccount not implemented")
 }
-func (UnimplementedAuthServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error) {
+func (UnimplementedAccountServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
 }
-func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
+func (UnimplementedAccountServiceServer) mustEmbedUnimplementedAccountServiceServer() {}
 
-// UnsafeAuthServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AuthServiceServer will
+// UnsafeAccountServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AccountServiceServer will
 // result in compilation errors.
-type UnsafeAuthServiceServer interface {
-	mustEmbedUnimplementedAuthServiceServer()
+type UnsafeAccountServiceServer interface {
+	mustEmbedUnimplementedAccountServiceServer()
 }
 
-func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv AuthServiceServer) {
-	s.RegisterService(&AuthService_ServiceDesc, srv)
+func RegisterAccountServiceServer(s grpc.ServiceRegistrar, srv AccountServiceServer) {
+	s.RegisterService(&AccountService_ServiceDesc, srv)
 }
 
-func _AuthService_CreateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AccountService_CreateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateAccountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).CreateAccount(ctx, in)
+		return srv.(AccountServiceServer).CreateAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth.v1.AuthService/CreateAccount",
+		FullMethod: "/account.v1.AccountService/CreateAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).CreateAccount(ctx, req.(*CreateAccountRequest))
+		return srv.(AccountServiceServer).CreateAccount(ctx, req.(*CreateAccountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_GetAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AccountService_GetAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAccountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).GetAccount(ctx, in)
+		return srv.(AccountServiceServer).GetAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth.v1.AuthService/GetAccount",
+		FullMethod: "/account.v1.AccountService/GetAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).GetAccount(ctx, req.(*GetAccountRequest))
+		return srv.(AccountServiceServer).GetAccount(ctx, req.(*GetAccountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_UpdateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AccountService_UpdateAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateAccountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).UpdateAccount(ctx, in)
+		return srv.(AccountServiceServer).UpdateAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth.v1.AuthService/UpdateAccount",
+		FullMethod: "/account.v1.AccountService/UpdateAccount",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).UpdateAccount(ctx, req.(*UpdateAccountRequest))
+		return srv.(AccountServiceServer).UpdateAccount(ctx, req.(*UpdateAccountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AccountService_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ChangePasswordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).ChangePassword(ctx, in)
+		return srv.(AccountServiceServer).ChangePassword(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth.v1.AuthService/ChangePassword",
+		FullMethod: "/account.v1.AccountService/ChangePassword",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
+		return srv.(AccountServiceServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
+// AccountService_ServiceDesc is the grpc.ServiceDesc for AccountService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var AuthService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "auth.v1.AuthService",
-	HandlerType: (*AuthServiceServer)(nil),
+var AccountService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "account.v1.AccountService",
+	HandlerType: (*AccountServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateAccount",
-			Handler:    _AuthService_CreateAccount_Handler,
+			Handler:    _AccountService_CreateAccount_Handler,
 		},
 		{
 			MethodName: "GetAccount",
-			Handler:    _AuthService_GetAccount_Handler,
+			Handler:    _AccountService_GetAccount_Handler,
 		},
 		{
 			MethodName: "UpdateAccount",
-			Handler:    _AuthService_UpdateAccount_Handler,
+			Handler:    _AccountService_UpdateAccount_Handler,
 		},
 		{
 			MethodName: "ChangePassword",
-			Handler:    _AuthService_ChangePassword_Handler,
+			Handler:    _AccountService_ChangePassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

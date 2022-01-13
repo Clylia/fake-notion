@@ -3,14 +3,14 @@ config_version: 3
 
 http:
   rules:
-    - selector: auth.v1.AuthService.CreateAccount
+    - selector: account.v1.AccountService.CreateAccount
       post: /v1/accounts
       body: "*"
-    - selector: auth.v1.AuthService.UpdateAccount
+    - selector: account.v1.AccountService.UpdateAccount
       put: /v1/accounts/{id}
       body: "*"
-    - selector: auth.v1.AuthService.ChangePassword
+    - selector: account.v1.AccountService.ChangePassword
       post: /v1/accounts/{id}/password
       body: "*"
-    - selector: auth.v1.AuthService.GetAccount
+    - selector: account.v1.AccountService.GetAccount
       get: /v1/accounts/{id}
