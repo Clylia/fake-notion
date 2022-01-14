@@ -16,10 +16,11 @@ import (
 )
 
 const (
-	accountField  = "account"
-	usernameField = accountField + ".username"
-	emailField    = accountField + ".email"
-	passwordField = accountField + ".password"
+	accountField        = "account"
+	usernameField       = accountField + ".username"
+	emailField          = accountField + ".email"
+	passwordField       = accountField + ".password"
+	filterPasswordField = "password"
 )
 
 // Mongo defines a mongo dao.

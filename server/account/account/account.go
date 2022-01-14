@@ -44,10 +44,10 @@ func (s *Service) CreateAccount(c context.Context, req *accountpb.CreateAccountR
 		s.Logger.Error("cannot create account", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+	ar.Account.Password = ""
 	return &accountpb.AccountEntity{
-		Id:       ar.ID.Hex(),
-		Username: ar.Account.Username,
-		Email:    ar.Account.Email,
+		Id:      ar.ID.Hex(),
+		Account: ar.Account,
 	}, nil
 }
 
@@ -58,10 +58,11 @@ func (s *Service) GetAccount(c context.Context, req *accountpb.GetAccountRequest
 		s.Logger.Error("cannot get account", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+
+	ar.Account.Password = ""
 	return &accountpb.AccountEntity{
-		Id:       ar.ID.Hex(),
-		Username: ar.Account.Username,
-		Email:    ar.Account.Email,
+		Id:      ar.ID.Hex(),
+		Account: ar.Account,
 	}, nil
 }
 

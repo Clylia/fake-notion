@@ -34,8 +34,7 @@ message Account {
 
 message AccountEntity {
     string id = 1;
-    string username = 2;
-    string email = 3;
+    Account account = 2;
 }
 
 message GetAccountRequest {
