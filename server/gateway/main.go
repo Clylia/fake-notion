@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	accountpb "notion/account/api/gen/v1"
+	authpb "notion/auth/api/gen/v1"
 	"notion/shared/auth"
 	"notion/shared/server"
 
@@ -19,7 +20,8 @@ import (
 )
 
 var addr = flag.String("addr", ":8080", "address to listen")
-var accountAddr = flag.String("auth_addr", "localhost:8081", "address for auth service")
+var accountAddr = flag.String("account_addr", "localhost:8081", "address for account service")
+var authAddr = flag.String("auth_addr", "localhost:8082", "address for auth service")
 
 func main() {
 	flag.Parse()
@@ -58,6 +60,11 @@ func main() {
 			name:         "account",
 			addr:         *accountAddr,
 			registerFunc: accountpb.RegisterAccountServiceHandlerFromEndpoint,
+		},
+		{
+			name: "auth",
+			addr: *authAddr,
+			registerFunc: authpb.RegisterAuthServiceHandlerFromEndpoint,
 		},
 	}
 
