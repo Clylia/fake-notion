@@ -15,7 +15,8 @@ import (
 
 // Service implements auth service.
 type Service struct {
-	authpb.AuthServiceServer
+	authpb.UnimplementedAuthServiceServer
+
 	Decryptor      Decryptor
 	TokenGenerator TokenGenerator
 	TokenExprie    time.Duration
@@ -60,4 +61,10 @@ func (s *Service) Login(c context.Context, req *authpb.LoginRequest) (*authpb.Lo
 		AccessToken: tkn,
 		ExpiresIn:   int32(s.TokenExprie.Seconds()),
 	}, nil
+}
+
+// Refresh refreshs login.
+func (s *Service) Refresh(c context.Context, req *authpb.RefreshLoginRequest) (*authpb.RefreshLoginResponse, error) {
+	// TODO: implement
+	return nil, nil
 }
