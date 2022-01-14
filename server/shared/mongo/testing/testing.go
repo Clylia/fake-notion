@@ -90,7 +90,7 @@ func NewDefaultClient(c context.Context) (*mongo.Client, error) {
 func SetupIndexes(c context.Context, d *mongo.Database) error {
 	_, err := d.Collection("account").Indexes().CreateOne(c, mongo.IndexModel{
 		Keys: bson.D{
-			{Key: "email", Value: 1},
+			{Key: "account.email", Value: 1},
 		},
 		Options: options.Index().SetUnique(true),
 	})
