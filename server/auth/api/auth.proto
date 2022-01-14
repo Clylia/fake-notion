@@ -13,7 +13,6 @@ message LoginResponse {
     int32 expires_in = 3;
 }
 
-
 message RefreshLoginRequest {
     string refresh_token = 1;
 }
