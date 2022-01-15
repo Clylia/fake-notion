@@ -7,6 +7,7 @@ import (
 	"notion/auth/auth"
 	"notion/auth/auth/dao"
 	"notion/auth/auth/token"
+	tokenutil "notion/shared/auth/token"
 	"notion/shared/enc"
 	"notion/shared/server"
 	"time"
@@ -24,6 +25,9 @@ import (
 var addr = flag.String("addr", ":8082", "address to listen")
 var mongoURI = flag.String("mongo_uri", "mongodb://localhost:27017", "mongo uri")
 var privateKeyFile = flag.String("private_key_file", "auth/private.key", "private key file")
+var refreshKey = flag.String("refresh_key",
+	"notion_refresh_key_2022-01-15_21-37-19fjsadlkfjqlkrj932410934*()@$*)($#@OJFSJFLKSDV<?D<C>XVCKLSDJFLK%#@",
+	"refresh key")
 
 func main() {
 	flag.Parse()
@@ -52,11 +56,13 @@ func main() {
 		Addr: *addr,
 		RegisterFunc: func(s *grpc.Server) {
 			authpb.RegisterAuthServiceServer(s, &auth.Service{
-				Monogo:         dao.NewMongo(mongoClient.Database("notion")),
-				Logger:         logger,
-				TokenExprie:    30 * time.Minute,
-				TokenGenerator: token.NewJWTokenGen("notion/auth", privateKey),
-				Decryptor:      enc.New(),
+				Monogo:             dao.NewMongo(mongoClient.Database("notion")),
+				Logger:             logger,
+				AccessTokenExprie:  30 * time.Minute,   // a half hour
+				RefreshTokenExprie: 7 * 24 * time.Hour, // a week
+				TokenGenerator:     token.NewJWTTokenGen("notion/auth", privateKey, *refreshKey),
+				TokenVerifier:      tokenutil.NewJWTRefreshTokenVerifier(*refreshKey),
+				Decryptor:          enc.New(),
 			})
 		},
 		Logger: logger,

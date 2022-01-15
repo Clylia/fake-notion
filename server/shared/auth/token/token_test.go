@@ -67,7 +67,7 @@ func TestVerify(t *testing.T) {
 				return cc.now
 			}
 
-			accountID, err := v.Verify(cc.tkn)
+			accountID, err := v.VerifyAccessToken(cc.tkn)
 			if !cc.wantErr && err != nil {
 				t.Errorf("verification failed: %v", err)
 			}

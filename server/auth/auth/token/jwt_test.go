@@ -35,16 +35,16 @@ iVM1eFue1vPz2AaRcGtMlGEGt6uXc7GpMlMRHsRo6EZunSuPTPFc4CfLtM7BZGe+
 aKyDAfrTnW9sWOFWsp1xDc1kRuhZtJfc67KCRMcb+fOH/TDudGFhBg==
 -----END RSA PRIVATE KEY-----`
 
-func TestGenerateToken(t *testing.T) {
+func TestGenAccessToken(t *testing.T) {
 	key, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privateKey))
 	if err != nil {
 		t.Fatalf("cannot parse private key: %v", err)
 	}
-	g := NewJWTokenGen("coolcar/auth", key)
+	g := NewJWTTokenGen("coolcar/auth", key, "")
 	g.nowFunc = func() time.Time {
 		return time.Unix(1516239022, 0)
 	}
-	tkn, err := g.GenerateToken("5fe4a143289f4848ec97bdc9", 2*time.Hour)
+	tkn, err := g.GenAccessToken("5fe4a143289f4848ec97bdc9", 2*time.Hour)
 	if err != nil {
 		t.Errorf("cannot generate token: %v", err)
 	}

@@ -7,6 +7,7 @@ require (
 	github.com/docker/docker v20.10.12+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/google/uuid v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
 	github.com/namsral/flag v1.7.4-pre
 	go.mongodb.org/mongo-driver v1.8.2

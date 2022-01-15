@@ -2,11 +2,10 @@ package auth
 
 import (
 	"context"
-	"notion/shared/auth/token"
-	"notion/shared/id"
 	"fmt"
 	"io/ioutil"
-	"os"
+	"notion/shared/auth/token"
+	"notion/shared/id"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
@@ -26,12 +25,7 @@ const (
 
 // Interceptor creates a grpc auth interceptor.
 func Interceptor(publicKeyFile string) (grpc.UnaryServerInterceptor, error) {
-	f, err := os.Open(publicKeyFile)
-	if err != nil {
-		return nil, fmt.Errorf("cannot open public key file: %v", err)
-	}
-
-	b, err := ioutil.ReadAll(f)
+	b, err := ioutil.ReadFile(publicKeyFile)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read public key: %v", err)
 	}
@@ -50,7 +44,7 @@ func Interceptor(publicKeyFile string) (grpc.UnaryServerInterceptor, error) {
 }
 
 type tokenVerifier interface {
-	Verify(token string) (string, error)
+	VerifyAccessToken(token string) (string, error)
 }
 
 type interceptor struct {
@@ -58,8 +52,6 @@ type interceptor struct {
 }
 
 func (i *interceptor) HandleReq(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-	// 更新行程在另一个微服务里面没有携带token，但微信小程序发送请求会携带一个特殊的头部
-	// 如果能从这个特殊的头部获取到值(account_id)，那么就能更新行程
 	aid := impersonationFromContext(ctx)
 	if aid != "" {
 		fmt.Printf("impersonating %q\n", aid)
@@ -70,7 +62,7 @@ func (i *interceptor) HandleReq(ctx context.Context, req interface{}, info *grpc
 		return nil, status.Error(codes.Unauthenticated, "")
 	}
 
-	aid, err = i.verifier.Verify(tkn)
+	aid, err = i.verifier.VerifyAccessToken(tkn)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "token not valid: %v", err)
 	}
