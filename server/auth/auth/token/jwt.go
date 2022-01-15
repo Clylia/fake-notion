@@ -48,7 +48,7 @@ func (t *JWTTokenGen) GenRefreshToken(accountID string, exprie time.Duration) (s
 		return "", fmt.Errorf("cannot gen uuid %w", err)
 	}
 	nowSec := t.nowFunc().Unix()
-	tkn := jwt.NewWithClaims(jwt.SigningMethodRS512, tokenutil.JWTRefreshClaims{
+	tkn := jwt.NewWithClaims(jwt.SigningMethodHS512, tokenutil.JWTRefreshClaims{
 		AID: accountID,
 		StandardClaims: jwt.StandardClaims{
 			Issuer:    t.issuer,
@@ -58,5 +58,5 @@ func (t *JWTTokenGen) GenRefreshToken(accountID string, exprie time.Duration) (s
 		},
 	})
 
-	return tkn.SignedString(t.refreshKey)
+	return tkn.SignedString([]byte(t.refreshKey))
 }

@@ -75,7 +75,7 @@ func (s *Service) Login(c context.Context, req *authpb.LoginRequest) (*authpb.Lo
 	return &authpb.LoginResponse{
 		AccessToken:  accTkn,
 		RefreshToken: refTkn,
-		ExpiresIn:    int32(s.AccessTokenExprie.Seconds()),
+		ExpiresIn:    int32(time.Now().Add(s.AccessTokenExprie).Unix()),
 	}, nil
 }
 
