@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"notion/auth/auth/dao"
+	"notion/shared/id"
 	"time"
 
 	authpb "notion/auth/api/gen/v1"
@@ -84,7 +85,11 @@ func (s *Service) Refresh(c context.Context, req *authpb.RefreshLoginRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	// TODO: checks the aid exists
+	_, err = s.Monogo.Exists(c, id.AccountID(aid))
+	if err != nil {
+		s.Logger.Error(fmt.Sprintf("account id[%v] does no exists", aid), zap.Error(err))
+		return nil, status.Error(codes.Unauthenticated, "")
+	}
 	accTkn, err := s.TokenGenerator.GenAccessToken(aid, s.AccessTokenExprie)
 	if err != nil {
 		s.Logger.Error("cannot generate access token", zap.Error(err))
