@@ -6,6 +6,7 @@ import (
 	"notion/account/account/dao"
 	accountpb "notion/account/api/gen/v1"
 	"notion/shared/auth"
+	"notion/shared/errs"
 	"notion/shared/id"
 
 	"go.uber.org/zap"
@@ -18,7 +19,7 @@ type Encryptor interface {
 	Encrypt(password string) (hash string, err error)
 }
 
-// Service definds a car service.
+// Service defines a car service.
 type Service struct {
 	accountpb.UnimplementedAccountServiceServer
 
@@ -43,6 +44,9 @@ func (s *Service) CreateAccount(c context.Context, req *accountpb.CreateAccountR
 	}
 	ar, err = s.Mongo.CreateAccount(c, ar)
 	if err != nil {
+		if errs.IsDuplicateKeyErr(err) {
+			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("username[%v] or email[%v] has taken.", req.Username, req.Email))
+		}
 		s.Logger.Error("cannot create account", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -95,6 +99,9 @@ func (s *Service) UpdateAccount(c context.Context, req *accountpb.UpdateAccountR
 	}
 	_, err = s.Mongo.UpdateAccount(c, aid, update)
 	if err != nil {
+		if errs.IsDuplicateKeyErr(err) {
+			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("username[%v] or email[%v] has taken.", req.Username, req.Email))
+		}
 		s.Logger.Error("cannot update account", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}

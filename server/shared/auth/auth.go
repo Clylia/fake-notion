@@ -59,7 +59,9 @@ func (i *interceptor) HandleReq(ctx context.Context, req interface{}, info *grpc
 	}
 	tkn, err := tokenFromContext(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Unauthenticated, "")
+		// return nil, status.Error(codes.Unauthenticated, "")
+		// no need token
+		return handler(ctx, req)
 	}
 
 	aid, err = i.verifier.VerifyAccessToken(tkn)

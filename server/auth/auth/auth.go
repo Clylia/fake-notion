@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"notion/auth/auth/dao"
+	"notion/shared/errs"
 	"notion/shared/id"
 	"time"
 
@@ -48,6 +49,11 @@ func (s *Service) Login(c context.Context, req *authpb.LoginRequest) (*authpb.Lo
 	ar, err := s.Monogo.ResolveAccount(c, req.Email)
 	if err != nil {
 		// TODO: error of account not exists.
+		if errs.IsNoDocumentsErr(err) {
+			msg := fmt.Sprintf("login account email[%v] does no exists", req.Email)
+			s.Logger.Error(msg, zap.Error(err))
+			return nil, status.Error(codes.Unauthenticated, msg)
+		}
 		s.Logger.Error("cannot resolve account", zap.Error(err))
 		return nil, status.Error(codes.Internal, "")
 	}
@@ -58,7 +64,7 @@ func (s *Service) Login(c context.Context, req *authpb.LoginRequest) (*authpb.Lo
 		return nil, status.Error(codes.Internal, "")
 	}
 	if !ok {
-		return nil, status.Error(codes.Aborted, fmt.Sprintf("login email[%v] password invalid", req.Email))
+		return nil, status.Error(codes.Unauthenticated, fmt.Sprintf("login email[%v] password invalid", req.Email))
 	}
 
 	aid := ar.ID.Hex()
@@ -89,8 +95,12 @@ func (s *Service) Refresh(c context.Context, req *authpb.RefreshLoginRequest) (*
 	}
 	_, err = s.Monogo.Exists(c, id.AccountID(aid))
 	if err != nil {
-		s.Logger.Error(fmt.Sprintf("account id[%v] does no exists", aid), zap.Error(err))
-		return nil, status.Error(codes.Unauthenticated, "")
+		if errs.IsNoDocumentsErr(err) {
+			s.Logger.Error(fmt.Sprintf("account id[%v] does no exists", aid), zap.Error(err))
+			return nil, status.Error(codes.Unauthenticated, "")
+		}
+		s.Logger.Error(fmt.Sprintf("get account id[%v] error", aid), zap.Error(err))
+		return nil, status.Error(codes.Internal, "")
 	}
 	accTkn, err := s.TokenGenerator.GenAccessToken(aid, s.AccessTokenExprie)
 	if err != nil {
