@@ -2,8 +2,10 @@ package account
 
 import (
 	"context"
+	"fmt"
 	"notion/account/account/dao"
 	accountpb "notion/account/api/gen/v1"
+	"notion/shared/auth"
 	"notion/shared/id"
 
 	"go.uber.org/zap"
@@ -53,7 +55,17 @@ func (s *Service) CreateAccount(c context.Context, req *accountpb.CreateAccountR
 
 // GetAccount gets a account.
 func (s *Service) GetAccount(c context.Context, req *accountpb.GetAccountRequest) (*accountpb.AccountEntity, error) {
-	ar, err := s.Mongo.GetAccount(c, id.AccountID(req.Id))
+	aid, err := auth.AccountIDFromContext(c)
+	if err != nil {
+		return nil, err
+	}
+
+	if aid != id.AccountID(req.Id) {
+		s.Logger.Error(fmt.Sprintf("login account[%v] cannot get another account[%v]", aid.String(), req.Id))
+		return nil, status.Error(codes.Unauthenticated, "")
+	}
+
+	ar, err := s.Mongo.GetAccount(c, aid)
 	if err != nil {
 		s.Logger.Error("cannot get account", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
@@ -68,11 +80,20 @@ func (s *Service) GetAccount(c context.Context, req *accountpb.GetAccountRequest
 
 // UpdateAccount updates a account.
 func (s *Service) UpdateAccount(c context.Context, req *accountpb.UpdateAccountRequest) (*accountpb.UpdateAccountResponse, error) {
+	aid, err := auth.AccountIDFromContext(c)
+	if err != nil {
+		return nil, err
+	}
+
+	if aid != id.AccountID(req.Id) {
+		s.Logger.Error(fmt.Sprintf("login account[%v] cannot update another account[%v]", aid.String(), req.Id))
+		return nil, status.Error(codes.Unauthenticated, "")
+	}
 	update := &dao.AccountUpdate{
 		Username: req.Username,
 		Email:    req.Email,
 	}
-	_, err := s.Mongo.UpdateAccount(c, id.AccountID(req.Id), update)
+	_, err = s.Mongo.UpdateAccount(c, aid, update)
 	if err != nil {
 		s.Logger.Error("cannot update account", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
@@ -82,12 +103,22 @@ func (s *Service) UpdateAccount(c context.Context, req *accountpb.UpdateAccountR
 
 // ChangePassword changes a account password.
 func (s *Service) ChangePassword(c context.Context, req *accountpb.ChangePasswordRequest) (*accountpb.ChangePasswordResponse, error) {
+	aid, err := auth.AccountIDFromContext(c)
+	if err != nil {
+		return nil, err
+	}
+
+	if aid != id.AccountID(req.Id) {
+		s.Logger.Error(fmt.Sprintf("login account[%v] cannot update another account[%v]", aid.String(), req.Id))
+		return nil, status.Error(codes.Unauthenticated, "")
+	}
 	passowrd, err := s.Encryptor.Encrypt(req.Password)
 	if err != nil {
 		s.Logger.Error("cannot encrypt password", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	err = s.Mongo.ChangePassword(c, id.AccountID(req.Id), passowrd)
+
+	err = s.Mongo.ChangePassword(c, aid, passowrd)
 	if err != nil {
 		s.Logger.Error("cannot change password", zap.Error(err))
 		return nil, status.Error(codes.Internal, err.Error())

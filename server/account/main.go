@@ -19,6 +19,7 @@ import (
 
 var addr = flag.String("addr", ":8081", "address to listen")
 var mongoURI = flag.String("mongo_uri", "mongodb://localhost:27017", "mongo uri")
+var authPublicKeyFile = flag.String("auth_public_key_file", "shared/auth/public.key", "public key file")
 
 func main() {
 	flag.Parse()
@@ -46,5 +47,6 @@ func main() {
 				Logger:    logger,
 			})
 		},
+		AuthPublicKeyFile: *authPublicKeyFile,
 	}))
 }

@@ -47,6 +47,7 @@ type TokenVerifier interface {
 func (s *Service) Login(c context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
 	ar, err := s.Monogo.ResolveAccount(c, req.Email)
 	if err != nil {
+		// TODO: error of account not exists.
 		s.Logger.Error("cannot resolve account", zap.Error(err))
 		return nil, status.Error(codes.Internal, "")
 	}
@@ -80,7 +81,7 @@ func (s *Service) Login(c context.Context, req *authpb.LoginRequest) (*authpb.Lo
 	}, nil
 }
 
-// Refresh refreshs login.
+// Refresh refreshes login.
 func (s *Service) Refresh(c context.Context, req *authpb.RefreshLoginRequest) (*authpb.RefreshLoginResponse, error) {
 	aid, err := s.TokenVerifier.VerifyRefreshToken(req.RefreshToken)
 	if err != nil {
