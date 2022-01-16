@@ -58,7 +58,7 @@ func NewJWTRefreshTokenVerifier(refreshKey string) *JWTRefreshTokenVerifier {
 func (v *JWTRefreshTokenVerifier) VerifyRefreshToken(token string) (string, error) {
 	var clm JWTRefreshClaims
 	_, err := jwt.ParseWithClaims(token, &clm, func(*jwt.Token) (interface{}, error) {
-		return v.refreshKey, nil
+		return []byte(v.refreshKey), nil
 	})
 	if err != nil {
 		return "", fmt.Errorf("cannot parse token: %v", err)

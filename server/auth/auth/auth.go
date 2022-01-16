@@ -60,13 +60,14 @@ func (s *Service) Login(c context.Context, req *authpb.LoginRequest) (*authpb.Lo
 		return nil, status.Error(codes.Aborted, fmt.Sprintf("login email[%v] password invalid", req.Email))
 	}
 
-	accTkn, err := s.TokenGenerator.GenAccessToken(ar.ID.String(), s.AccessTokenExprie)
+	aid := ar.ID.Hex()
+	accTkn, err := s.TokenGenerator.GenAccessToken(aid, s.AccessTokenExprie)
 	if err != nil {
 		s.Logger.Error("cannot generate access token", zap.Error(err))
 		return nil, status.Error(codes.Internal, "")
 	}
 
-	refTkn, err := s.TokenGenerator.GenRefreshToken("", s.RefreshTokenExprie)
+	refTkn, err := s.TokenGenerator.GenRefreshToken(aid, s.RefreshTokenExprie)
 	if err != nil {
 		s.Logger.Error("cannot generate refresh token", zap.Error(err))
 		return nil, status.Error(codes.Internal, "")
@@ -75,7 +76,7 @@ func (s *Service) Login(c context.Context, req *authpb.LoginRequest) (*authpb.Lo
 	return &authpb.LoginResponse{
 		AccessToken:  accTkn,
 		RefreshToken: refTkn,
-		ExpiresIn:    int32(time.Now().Add(s.AccessTokenExprie).Unix()),
+		ExpiresIn:    int32(s.AccessTokenExprie.Seconds()),
 	}, nil
 }
 
