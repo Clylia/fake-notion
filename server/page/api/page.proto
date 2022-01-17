@@ -1,0 +1,57 @@
+syntax = "proto3";
+package page.v1;
+option go_package="notion/page/api/gen/v1;pagepb";
+
+message Page {
+    string id = 1;
+    string html = 2;
+    string image_url = 3;
+    string tag = 4;
+}
+
+message PageEmtity {
+    string id = 1;
+    string creator_id = 2;
+    repeated Page blocks = 3;
+    int32 created_at = 4;
+    int32 updated_at = 5;
+}
+
+message GetPageRequest {
+    string page_id = 1;
+}
+
+message GetPagesRequest {
+}
+
+message GetPagesResponse {
+    repeated PageEmtity pages = 1;
+}
+
+message CreatePageRequest {
+    string page_id = 1;
+    string creator_id = 2;
+    repeated Page blocks = 3;
+}
+
+message UpdatePageRequest {
+    string page_id = 1;
+    string creator_id = 2;
+    repeated Page blocks = 3;
+}
+
+message DeletePageRequest {
+    string page_id = 1;
+    string creator_id = 2;
+}
+
+message DeletePageResponse {
+}
+
+service PageService {
+    rpc GetPage (GetPageRequest) returns (PageEmtity);
+    rpc GetPages (GetPagesRequest) returns (GetPagesResponse);
+    rpc CreatePage (CreatePageRequest) returns (PageEmtity);
+    rpc UpdatePage (UpdatePageRequest) returns (PageEmtity);
+    rpc DeletePage (DeletePageRequest) returns (DeletePageResponse);
+}

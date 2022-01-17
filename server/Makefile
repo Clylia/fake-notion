@@ -17,4 +17,7 @@ run:
 	go run ./$(DOMAIN)/main.go
 
 runall: 
-	go run ./auth/main.go | go run ./account/main.go | go run ./gateway/main.go
+	go run ./auth/main.go \
+	| go run ./account/main.go \
+	| go run ./gateway/main.go
+
