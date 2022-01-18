@@ -40,7 +40,7 @@ func TestGenAccessToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot parse private key: %v", err)
 	}
-	g := NewJWTTokenGen("coolcar/auth", key, "")
+	g := NewJWTTokenGen("notion/auth", key, "")
 	g.nowFunc = func() time.Time {
 		return time.Unix(1516239022, 0)
 	}

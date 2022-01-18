@@ -13,3 +13,4 @@ function genProto {
 
 genProto auth
 genProto account
+genProto page

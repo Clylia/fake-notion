@@ -1,6 +1,6 @@
 syntax = "proto3";
 package auth.v1;
-option go_package="coolcar/auth/api/gen/v1;authpb";
+option go_package="notion/auth/api/gen/v1;authpb";
 
 message LoginRequest {
     string email = 1;

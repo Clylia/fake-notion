@@ -1,6 +1,6 @@
 syntax = "proto3";
 package account.v1;
-option go_package="coolcar/account/api/gen/v1;accountpb";
+option go_package="notion/account/api/gen/v1;accountpb";
 
 message CreateAccountRequest {
     string username = 1;

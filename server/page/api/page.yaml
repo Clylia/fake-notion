@@ -1,0 +1,17 @@
+type: google.api.Service
+config_version: 3
+
+http:
+  rules:
+    - selector: page.v1.PageService.GetPage
+      get: /v1/pages/{page_id}
+    - selector: page.v1.PageService.GetPages
+      get: /v1/pages
+    - selector: page.v1.PageService.CreatePage
+      post: /v1/pages/{page_id}
+      body: "*"
+    - selector: page.v1.PageService.UpdatePage
+      put: /v1/pages/{page_id}
+      body: "*"
+    - selector: page.v1.PageService.DeletePage
+      delete: /v1/pages/{page_id}

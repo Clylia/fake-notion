@@ -19,7 +19,7 @@ type Encryptor interface {
 	Encrypt(password string) (hash string, err error)
 }
 
-// Service defines a car service.
+// Service defines a account service.
 type Service struct {
 	accountpb.UnimplementedAccountServiceServer
 
