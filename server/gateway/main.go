@@ -4,6 +4,7 @@ import (
 	"context"
 	accountpb "notion/account/api/gen/v1"
 	authpb "notion/auth/api/gen/v1"
+	pagepb "notion/page/api/gen/v1"
 	"notion/shared/auth"
 	"notion/shared/server"
 
@@ -22,6 +23,7 @@ import (
 var addr = flag.String("addr", ":8080", "address to listen")
 var accountAddr = flag.String("account_addr", "localhost:8081", "address for account service")
 var authAddr = flag.String("auth_addr", "localhost:8082", "address for auth service")
+var pageAddr = flag.String("page_addr", "localhost:8083", "address for page service")
 
 func main() {
 	flag.Parse()
@@ -62,9 +64,14 @@ func main() {
 			registerFunc: accountpb.RegisterAccountServiceHandlerFromEndpoint,
 		},
 		{
-			name: "auth",
-			addr: *authAddr,
+			name:         "auth",
+			addr:         *authAddr,
 			registerFunc: authpb.RegisterAuthServiceHandlerFromEndpoint,
+		},
+		{
+			name:         "page",
+			addr:         *pageAddr,
+			registerFunc: pagepb.RegisterPageServiceHandlerFromEndpoint,
 		},
 	}
 
