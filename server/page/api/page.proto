@@ -27,7 +27,7 @@ message PageEmtity {
 }
 
 message GetPageRequest {
-    string page_id = 1;
+    string id = 1;
 }
 
 message GetPagesRequest {
@@ -38,17 +38,17 @@ message GetPagesResponse {
 }
 
 message CreatePageRequest {
-    string page_id = 1;
+    string id = 1;
     Page page = 2;
 }
 
 message UpdatePageRequest {
-    string page_id = 1;
+    string id = 1;
     Page page = 2;
 }
 
 message DeletePageRequest {
-    string page_id = 1;
+    string id = 1;
 }
 
 message DeletePageResponse {

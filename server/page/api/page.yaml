@@ -4,14 +4,14 @@ config_version: 3
 http:
   rules:
     - selector: page.v1.PageService.GetPage
-      get: /v1/pages/{page_id}
+      get: /v1/pages/{id}
     - selector: page.v1.PageService.GetPages
       get: /v1/pages
     - selector: page.v1.PageService.CreatePage
-      post: /v1/pages/{page_id}
+      post: /v1/pages/{id}
       body: "*"
     - selector: page.v1.PageService.UpdatePage
-      put: /v1/pages/{page_id}
+      put: /v1/pages/{id}
       body: "*"
     - selector: page.v1.PageService.DeletePage
-      delete: /v1/pages/{page_id}
+      delete: /v1/pages/{id}
