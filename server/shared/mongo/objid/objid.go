@@ -1,8 +1,8 @@
 package objid
 
 import (
-	"notion/shared/id"
 	"fmt"
+	"notion/shared/id"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -25,4 +25,9 @@ func MustFromID(id fmt.Stringer) primitive.ObjectID {
 // ToAccountID converts object id to account id.
 func ToAccountID(oid primitive.ObjectID) id.AccountID {
 	return id.AccountID(oid.Hex())
+}
+
+// ToPageID converts object id to page id.
+func ToPageID(oid primitive.ObjectID) id.PageID {
+	return id.PageID(oid.Hex())
 }

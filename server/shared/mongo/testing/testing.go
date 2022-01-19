@@ -91,6 +91,7 @@ func SetupIndexes(c context.Context, d *mongo.Database) error {
 	_, err := d.Collection("account").Indexes().CreateOne(c, mongo.IndexModel{
 		Keys: bson.D{
 			{Key: "account.email", Value: 1},
+			{Key: "account.username", Value: 1},
 		},
 		Options: options.Index().SetUnique(true),
 	})

@@ -14,7 +14,6 @@ message BlockEmtity {
 }
 
 message Page {
-    string id = 1;
     string creator_id = 2;
     repeated BlockEmtity blocks = 3;
     int32 created_at = 4;
