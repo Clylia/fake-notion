@@ -15,7 +15,7 @@ import (
 	pagepb "notion/page/api/gen/v1"
 )
 
-func TestAccountLifecycle(t *testing.T) {
+func TestPageLifecycle(t *testing.T) {
 	c := context.Background()
 	mc, err := mongotesting.NewClient(c)
 	if err != nil {
