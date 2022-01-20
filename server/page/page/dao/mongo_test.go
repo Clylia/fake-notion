@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"time"
 
 	"notion/shared/errs"
-	"notion/shared/id"
+	mgutil "notion/shared/mongo"
 	"notion/shared/mongo/objid"
 	mongotesting "notion/shared/mongo/testing"
 
@@ -27,24 +26,22 @@ func TestPageLifecycle(t *testing.T) {
 		t.Fatalf("cannot setup indexes: %v", err)
 	}
 	m := NewMongo(db)
-	now := time.Now().Unix()
-	accountID := id.AccountID("aid")
+	now := mgutil.UpdatedAt()
+	accountID := mgutil.NewObjID()
 	page := PageRecord{
-		Page: pagepb.Page{
-			CreatorId: accountID.String(),
-			Blocks: []*pagepb.BlockEmtity{
-				{
-					Id: "3341dd8d-a9b2-48c1-99ff-ef31a1a7c4f2",
-					Block: &pagepb.Block{
-						Html:     "<div>hello notion<div>",
-						Tag:      "Html",
-						ImageUrl: "",
-					},
+		CreatorID: accountID,
+		Blocks: []*pagepb.BlockEmtity{
+			{
+				Id: "3341dd8d-a9b2-48c1-99ff-ef31a1a7c4f2",
+				Block: &pagepb.Block{
+					Html:     "<div>hello notion<div>",
+					Tag:      "Html",
+					ImageUrl: "",
 				},
 			},
-			CreatedAt: int32(now),
-			UpdatedAt: int32(now),
 		},
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 	cases := []struct {
 		name    string
@@ -77,7 +74,7 @@ func TestPageLifecycle(t *testing.T) {
 							},
 						},
 					},
-					CreatorID: accountID,
+					CreatorID: objid.ToAccountID(accountID),
 				}
 				p, err := m.UpdatePage(context.Background(), objid.ToPageID(page.ID), update)
 				if err != nil {
@@ -102,7 +99,7 @@ func TestPageLifecycle(t *testing.T) {
 		{
 			name: "delete_page_should_success",
 			op: func() error {
-				return m.DeletePage(context.Background(), objid.ToPageID(page.ID), accountID)
+				return m.DeletePage(context.Background(), objid.ToPageID(page.ID), objid.ToAccountID(accountID))
 			},
 			wantErr: false,
 		},

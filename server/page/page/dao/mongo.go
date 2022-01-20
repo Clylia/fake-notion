@@ -7,16 +7,16 @@ import (
 	"notion/shared/id"
 	mgutil "notion/shared/mongo"
 	"notion/shared/mongo/objid"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
 	blocksField    = "blocks"
-	updateAtField  = "update_at"
+	updateAtField  = "updateat"
 	creatorIDField = "creatorid"
 )
 
@@ -35,7 +35,10 @@ func NewMongo(db *mongo.Database) *Mongo {
 // PageRecord defines a page record in mongo db.
 type PageRecord struct {
 	mgutil.IDField `bson:"inline"`
-	pagepb.Page    `bson:"inline"`
+	CreatorID      primitive.ObjectID    `bson:"creatorid"`
+	Blocks         []*pagepb.BlockEmtity `bson:"blocks"`
+	CreatedAt      int64                 `bson:"createdat"`
+	UpdatedAt      int64                 `bson:"updatedat"`
 }
 
 // CreatePage creates a page.
@@ -71,18 +74,20 @@ func (m *Mongo) UpdatePage(c context.Context, id id.PageID, update *PageUpdate) 
 		return nil, fmt.Errorf("invalid page id[%v]: %w", id, err)
 	}
 
+	objAID, err := objid.FromID(update.CreatorID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid account id[%v]: %w", id, err)
+	}
 	filter := bson.M{
 		mgutil.IDFieldName: objID,
+		creatorIDField:     objAID,
 	}
 
 	u := bson.M{}
-	if update.CreatorID != "" {
-		u[creatorIDField] = update.CreatorID
-	}
 	if len(update.Blocks) > 0 {
 		u[blocksField] = update.Blocks
 	}
-	u[updateAtField] = time.Now().Unix()
+	u[updateAtField] = mgutil.UpdatedAt()
 
 	res := m.col.FindOneAndUpdate(c, filter, mgutil.Set(u),
 		options.FindOneAndUpdate().SetReturnDocument(options.After))
@@ -96,13 +101,14 @@ func (m *Mongo) DeletePage(c context.Context, pid id.PageID, aid id.AccountID) e
 		return fmt.Errorf("invalid page id[%v]: %w", pid, err)
 	}
 
-	// accountObjID, err := objid.FromID(pid)
-	// if err != nil {
-	// 	return fmt.Errorf("invalid account id[%v]: %w", aid, err)
-	// }
+	accountObjID, err := objid.FromID(aid)
+	if err != nil {
+		return fmt.Errorf("invalid account id[%v]: %w", aid, err)
+	}
 
 	filter := bson.M{
 		mgutil.IDFieldName: pageObjID,
+		creatorIDField:     accountObjID,
 	}
 
 	res := m.col.FindOneAndDelete(c, filter)

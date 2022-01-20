@@ -14,10 +14,10 @@ message BlockEmtity {
 }
 
 message Page {
-    string creator_id = 2;
-    repeated BlockEmtity blocks = 3;
-    int32 created_at = 4;
-    int32 updated_at = 5;
+    string creator_id = 1;
+    repeated BlockEmtity blocks = 2;
+    int32 created_at = 3;
+    int32 updated_at = 4;
 }
 
 message PageEmtity {
