@@ -7,11 +7,10 @@ import (
 	"testing"
 
 	"notion/shared/errs"
+	"notion/shared/id"
 	mgutil "notion/shared/mongo"
 	"notion/shared/mongo/objid"
 	mongotesting "notion/shared/mongo/testing"
-
-	pagepb "notion/page/api/gen/v1"
 )
 
 func TestPageLifecycle(t *testing.T) {
@@ -29,19 +28,23 @@ func TestPageLifecycle(t *testing.T) {
 	now := mgutil.UpdatedAt()
 	accountID := mgutil.NewObjID()
 	page := PageRecord{
+		CreatedAtField: mgutil.CreatedAtField{
+			CreatedAt: now,
+		},
+		UpdatedAtField: mgutil.UpdatedAtField{
+			UpdatedAt: now,
+		},
 		CreatorID: accountID,
-		Blocks: []*pagepb.BlockEmtity{
+		Blocks: []*BlockEmtity{
 			{
-				Id: "3341dd8d-a9b2-48c1-99ff-ef31a1a7c4f2",
-				Block: &pagepb.Block{
-					Html:     "<div>hello notion<div>",
-					Tag:      "Html",
-					ImageUrl: "",
+				IDField: mgutil.IDField{
+					ID: mgutil.NewObjID(),
 				},
+				HTML:     "<div>hello notion<div>",
+				Tag:      "Html",
+				ImageURL: "",
 			},
 		},
-		CreatedAt: now,
-		UpdatedAt: now,
 	}
 	cases := []struct {
 		name    string
@@ -51,11 +54,12 @@ func TestPageLifecycle(t *testing.T) {
 		{
 			name: "add_page_should_success",
 			op: func() error {
-				p, err := m.CreatePage(context.Background(), &page)
+				p, err := m.CreatePage(context.Background(), objid.ToAccountID(accountID), &page)
 				if err != nil {
 					return err
 				}
-				page.ID = p.ID
+
+				page.ID = objid.MustFromID(id.PageID(p.Id))
 				return nil
 			},
 			wantErr: false,
@@ -63,33 +67,30 @@ func TestPageLifecycle(t *testing.T) {
 		{
 			name: "update_page_should_success",
 			op: func() error {
-				update := &PageUpdate{
-					Blocks: []*pagepb.BlockEmtity{
-						{
-							Id: "192b70d5-f0f5-4e43-a0f1-af48da3be186",
-							Block: &pagepb.Block{
-								Html:     "<div>hello notion2<div>",
-								Tag:      "Html",
-								ImageUrl: "",
-							},
+				blocks := []*BlockEmtity{
+					{
+						IDField: mgutil.IDField{
+							ID: mgutil.NewObjID(),
 						},
+						HTML:     "<div>hello notion2<div>",
+						Tag:      "Html",
+						ImageURL: "",
 					},
-					CreatorID: objid.ToAccountID(accountID),
 				}
-				p, err := m.UpdatePage(context.Background(), objid.ToPageID(page.ID), update)
+				p, err := m.UpdatePage(context.Background(), objid.ToPageID(page.ID), objid.ToAccountID(accountID), blocks)
 				if err != nil {
 					return err
 				}
 				if len(p.Blocks) != 1 {
-					return fmt.Errorf("expected update page has %v block but got %v", len(update.Blocks), len(p.Blocks))
+					return fmt.Errorf("expected update page has %v block but got %v", len(blocks), len(p.Blocks))
 				}
-				for i := 0; i < len(update.Blocks); i++ {
-					if update.Blocks[i].Id != p.Blocks[i].Id {
-						return fmt.Errorf("expected update page block id has %v but got %v", update.Blocks[i].Id, p.Blocks[i].Id)
+				for i := 0; i < len(blocks); i++ {
+					if blocks[i].ID.Hex() != p.Blocks[i].Id {
+						return fmt.Errorf("expected update page block id has %v but got %v", blocks[i].ID.Hex(), p.Blocks[i].Id)
 					}
 
-					if update.Blocks[i].Block.Html != p.Blocks[i].Block.Html {
-						return fmt.Errorf("expected update page block Html has %v but got %v", update.Blocks[i].Block.Html, p.Blocks[i].Block.Html)
+					if blocks[i].HTML != p.Blocks[i].Html {
+						return fmt.Errorf("expected update page block HTML has %v but got %v", blocks[i].HTML, p.Blocks[i].Html)
 					}
 				}
 				return nil
@@ -106,7 +107,7 @@ func TestPageLifecycle(t *testing.T) {
 		{
 			name: "check_delete_page_should_success",
 			op: func() error {
-				_, err := m.GetPage(context.Background(), objid.ToPageID(page.ID))
+				_, err := m.GetPage(context.Background(), objid.ToPageID(page.ID), objid.ToAccountID(accountID))
 				if errs.IsNoDocumentsErr(err) {
 					return nil
 				}

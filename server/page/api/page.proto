@@ -2,27 +2,19 @@ syntax = "proto3";
 package page.v1;
 option go_package="notion/page/api/gen/v1;pagepb";
 
-message Block {
-    string html = 1;
-    string image_url = 2;
-    string tag = 3;
-}
-
 message BlockEmtity {
     string id = 1;
-    Block block = 2;
-}
-
-message Page {
-    string creator_id = 1;
-    repeated BlockEmtity blocks = 2;
-    int32 created_at = 3;
-    int32 updated_at = 4;
+    string html = 2;
+    string image_url = 3;
+    string tag = 4;
 }
 
 message PageEmtity {
     string id = 1;
-    Page page = 2;
+    string creator_id = 2;
+    repeated BlockEmtity blocks = 3;
+    int32 created_at = 4;
+    int32 updated_at = 5;
 }
 
 message GetPageRequest {
@@ -38,12 +30,12 @@ message GetPagesResponse {
 
 message CreatePageRequest {
     string id = 1;
-    Page page = 2;
+    PageEmtity page = 2;
 }
 
 message UpdatePageRequest {
     string id = 1;
-    Page page = 2;
+    repeated BlockEmtity blocks = 2;
 }
 
 message DeletePageRequest {

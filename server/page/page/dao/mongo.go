@@ -34,58 +34,75 @@ func NewMongo(db *mongo.Database) *Mongo {
 
 // PageRecord defines a page record in mongo db.
 type PageRecord struct {
+	mgutil.IDField        `bson:"inline"`
+	mgutil.CreatedAtField `bson:"inline"`
+	mgutil.UpdatedAtField `bson:"inline"`
+	CreatorID             primitive.ObjectID `bson:"creatorid"`
+	Blocks                []*BlockEmtity     `bson:"blocks"`
+}
+
+// BlockEmtity defines a block emtity.
+type BlockEmtity struct {
 	mgutil.IDField `bson:"inline"`
-	CreatorID      primitive.ObjectID    `bson:"creatorid"`
-	Blocks         []*pagepb.BlockEmtity `bson:"blocks"`
-	CreatedAt      int64                 `bson:"createdat"`
-	UpdatedAt      int64                 `bson:"updatedat"`
+	Tag            string `bson:"tag"`
+	HTML           string `bson:"html"`
+	ImageURL       string `bson:"imageurl"`
 }
 
 // CreatePage creates a page.
-func (m *Mongo) CreatePage(c context.Context, page *PageRecord) (*PageRecord, error) {
+func (m *Mongo) CreatePage(c context.Context, aid id.AccountID, page *PageRecord) (*pagepb.PageEmtity, error) {
+	objAID, err := objid.FromID(aid)
+	if err != nil {
+		return nil, fmt.Errorf("invalid account id[%v]: %w", aid, err)
+	}
+	page.CreatorID = objAID
 	page.ID = mgutil.NewObjID()
-	_, err := m.col.InsertOne(c, page)
+	now := mgutil.UpdatedAt()
+	page.CreatedAt = now
+	page.UpdatedAt = now
+	_, err = m.col.InsertOne(c, page)
 	if err != nil {
 		return nil, err
 	}
-	return page, err
+	return convertPageEmtity(page), err
 }
 
 // GetPage gets a page.
-func (m *Mongo) GetPage(c context.Context, id id.PageID) (*PageRecord, error) {
-	objID, err := objid.FromID(id)
+func (m *Mongo) GetPage(c context.Context, pid id.PageID, aid id.AccountID) (*pagepb.PageEmtity, error) {
+	objPID, err := objid.FromID(pid)
 	if err != nil {
-		return nil, fmt.Errorf("invalid page id[%v]: %w", id, err)
+		return nil, fmt.Errorf("invalid page id[%v]: %w", pid, err)
+	}
+
+	objAID, err := objid.FromID(aid)
+	if err != nil {
+		return nil, fmt.Errorf("invalid account id[%v]: %w", aid, err)
 	}
 	return convertSingleResult(m.col.FindOne(c, bson.M{
-		mgutil.IDFieldName: objID,
+		mgutil.IDFieldName: objPID,
+		creatorIDField:     objAID,
 	}))
 }
 
-type PageUpdate struct {
-	Blocks    []*pagepb.BlockEmtity
-	CreatorID id.AccountID
-}
-
 // UpdatePage updates a page.
-func (m *Mongo) UpdatePage(c context.Context, id id.PageID, update *PageUpdate) (*PageRecord, error) {
-	objID, err := objid.FromID(id)
+func (m *Mongo) UpdatePage(c context.Context, pid id.PageID, aid id.AccountID, blocks []*BlockEmtity) (*pagepb.PageEmtity, error) {
+	objPID, err := objid.FromID(pid)
 	if err != nil {
-		return nil, fmt.Errorf("invalid page id[%v]: %w", id, err)
+		return nil, fmt.Errorf("invalid page id[%v]: %w", pid, err)
 	}
 
-	objAID, err := objid.FromID(update.CreatorID)
+	objAID, err := objid.FromID(aid)
 	if err != nil {
-		return nil, fmt.Errorf("invalid account id[%v]: %w", id, err)
+		return nil, fmt.Errorf("invalid account id[%v]: %w", aid, err)
 	}
 	filter := bson.M{
-		mgutil.IDFieldName: objID,
+		mgutil.IDFieldName: objPID,
 		creatorIDField:     objAID,
 	}
 
 	u := bson.M{}
-	if len(update.Blocks) > 0 {
-		u[blocksField] = update.Blocks
+	if len(blocks) > 0 {
+		u[blocksField] = blocks
 	}
 	u[updateAtField] = mgutil.UpdatedAt()
 
@@ -96,34 +113,73 @@ func (m *Mongo) UpdatePage(c context.Context, id id.PageID, update *PageUpdate) 
 
 // DeletePage delete a page.
 func (m *Mongo) DeletePage(c context.Context, pid id.PageID, aid id.AccountID) error {
-	pageObjID, err := objid.FromID(pid)
+	objPID, err := objid.FromID(pid)
 	if err != nil {
 		return fmt.Errorf("invalid page id[%v]: %w", pid, err)
 	}
 
-	accountObjID, err := objid.FromID(aid)
+	objAID, err := objid.FromID(aid)
 	if err != nil {
 		return fmt.Errorf("invalid account id[%v]: %w", aid, err)
 	}
 
 	filter := bson.M{
-		mgutil.IDFieldName: pageObjID,
-		creatorIDField:     accountObjID,
+		mgutil.IDFieldName: objPID,
+		creatorIDField:     objAID,
 	}
 
 	res := m.col.FindOneAndDelete(c, filter)
 	return res.Err()
 }
 
-func convertSingleResult(res *mongo.SingleResult) (*PageRecord, error) {
+func convertSingleResult(res *mongo.SingleResult) (*pagepb.PageEmtity, error) {
 	if err := res.Err(); err != nil {
 		return nil, err
 	}
 
-	var ar PageRecord
-	err := res.Decode(&ar)
+	var pr PageRecord
+	err := res.Decode(&pr)
 	if err != nil {
 		return nil, fmt.Errorf("cannot decode: %w", err)
 	}
-	return &ar, nil
+
+	return convertPageEmtity(&pr), nil
+}
+
+func convertPageEmtity(pr *PageRecord) *pagepb.PageEmtity {
+	var page pagepb.PageEmtity
+	page.Id = pr.ID.Hex()
+
+	var blocks []*pagepb.BlockEmtity
+	for _, b := range pr.Blocks {
+		var block pagepb.BlockEmtity
+		block.Id = b.ID.Hex()
+		block.Html = b.HTML
+		block.Tag = b.Tag
+		block.ImageUrl = b.ImageURL
+		blocks = append(blocks, &block)
+	}
+	page.Blocks = blocks
+	page.CreatedAt = int32(pr.CreatedAt)
+	page.UpdatedAt = int32(pr.UpdatedAt)
+	return &page
+}
+
+// ConvertPageRecord convert to page record for insert mongo DB.
+func ConvertPageRecord(page *pagepb.PageEmtity) *PageRecord {
+	var blocks []*BlockEmtity
+	for _, b := range page.Blocks {
+		var block BlockEmtity
+		block.ID = mgutil.NewObjID()
+		block.HTML = b.Html
+		block.Tag = b.Tag
+		// TODO: image should upload to image service
+		block.ImageURL = b.ImageUrl
+		blocks = append(blocks, &block)
+	}
+	p := PageRecord{
+		Blocks: blocks,
+	}
+
+	return &p
 }

@@ -26,6 +26,16 @@ type UpdatedAtField struct {
 	UpdatedAt int64 `bson:"updatedat"`
 }
 
+// CreatedAtField defines the createdat field.
+type CreatedAtField struct {
+	CreatedAt int64 `bson:"createdat"`
+}
+
+// DeletedAtField defines the deletedat field.
+type DeletedAtField struct {
+	DeletedAt int64 `bson:"deletedat"`
+}
+
 // NewObjID generates a new object id.
 var NewObjID = primitive.NewObjectID
 
