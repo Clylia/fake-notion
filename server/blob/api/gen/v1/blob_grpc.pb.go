@@ -23,8 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BlobServiceClient interface {
 	CreateBlob(ctx context.Context, in *CreateBlobRequest, opts ...grpc.CallOption) (*CreateBlobResponse, error)
-	GetBlob(ctx context.Context, in *GetBlobRequest, opts ...grpc.CallOption) (*GetBlobResponse, error)
-	GetBlobURL(ctx context.Context, in *GetBlobURLRequest, opts ...grpc.CallOption) (*GetBlobURLResponse, error)
+	DeleteBlob(ctx context.Context, in *DeleteBlobRequest, opts ...grpc.CallOption) (*DeleteBlobResponse, error)
 }
 
 type blobServiceClient struct {
@@ -37,25 +36,16 @@ func NewBlobServiceClient(cc grpc.ClientConnInterface) BlobServiceClient {
 
 func (c *blobServiceClient) CreateBlob(ctx context.Context, in *CreateBlobRequest, opts ...grpc.CallOption) (*CreateBlobResponse, error) {
 	out := new(CreateBlobResponse)
-	err := c.cc.Invoke(ctx, "/notion.v1.BlobService/CreateBlob", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/blob.v1.BlobService/CreateBlob", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *blobServiceClient) GetBlob(ctx context.Context, in *GetBlobRequest, opts ...grpc.CallOption) (*GetBlobResponse, error) {
-	out := new(GetBlobResponse)
-	err := c.cc.Invoke(ctx, "/notion.v1.BlobService/GetBlob", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *blobServiceClient) GetBlobURL(ctx context.Context, in *GetBlobURLRequest, opts ...grpc.CallOption) (*GetBlobURLResponse, error) {
-	out := new(GetBlobURLResponse)
-	err := c.cc.Invoke(ctx, "/notion.v1.BlobService/GetBlobURL", in, out, opts...)
+func (c *blobServiceClient) DeleteBlob(ctx context.Context, in *DeleteBlobRequest, opts ...grpc.CallOption) (*DeleteBlobResponse, error) {
+	out := new(DeleteBlobResponse)
+	err := c.cc.Invoke(ctx, "/blob.v1.BlobService/DeleteBlob", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +57,7 @@ func (c *blobServiceClient) GetBlobURL(ctx context.Context, in *GetBlobURLReques
 // for forward compatibility
 type BlobServiceServer interface {
 	CreateBlob(context.Context, *CreateBlobRequest) (*CreateBlobResponse, error)
-	GetBlob(context.Context, *GetBlobRequest) (*GetBlobResponse, error)
-	GetBlobURL(context.Context, *GetBlobURLRequest) (*GetBlobURLResponse, error)
+	DeleteBlob(context.Context, *DeleteBlobRequest) (*DeleteBlobResponse, error)
 	mustEmbedUnimplementedBlobServiceServer()
 }
 
@@ -79,11 +68,8 @@ type UnimplementedBlobServiceServer struct {
 func (UnimplementedBlobServiceServer) CreateBlob(context.Context, *CreateBlobRequest) (*CreateBlobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBlob not implemented")
 }
-func (UnimplementedBlobServiceServer) GetBlob(context.Context, *GetBlobRequest) (*GetBlobResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBlob not implemented")
-}
-func (UnimplementedBlobServiceServer) GetBlobURL(context.Context, *GetBlobURLRequest) (*GetBlobURLResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBlobURL not implemented")
+func (UnimplementedBlobServiceServer) DeleteBlob(context.Context, *DeleteBlobRequest) (*DeleteBlobResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteBlob not implemented")
 }
 func (UnimplementedBlobServiceServer) mustEmbedUnimplementedBlobServiceServer() {}
 
@@ -108,7 +94,7 @@ func _BlobService_CreateBlob_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/notion.v1.BlobService/CreateBlob",
+		FullMethod: "/blob.v1.BlobService/CreateBlob",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BlobServiceServer).CreateBlob(ctx, req.(*CreateBlobRequest))
@@ -116,38 +102,20 @@ func _BlobService_CreateBlob_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BlobService_GetBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBlobRequest)
+func _BlobService_DeleteBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteBlobRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BlobServiceServer).GetBlob(ctx, in)
+		return srv.(BlobServiceServer).DeleteBlob(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/notion.v1.BlobService/GetBlob",
+		FullMethod: "/blob.v1.BlobService/DeleteBlob",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlobServiceServer).GetBlob(ctx, req.(*GetBlobRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BlobService_GetBlobURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetBlobURLRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BlobServiceServer).GetBlobURL(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/notion.v1.BlobService/GetBlobURL",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlobServiceServer).GetBlobURL(ctx, req.(*GetBlobURLRequest))
+		return srv.(BlobServiceServer).DeleteBlob(ctx, req.(*DeleteBlobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -156,7 +124,7 @@ func _BlobService_GetBlobURL_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var BlobService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "notion.v1.BlobService",
+	ServiceName: "blob.v1.BlobService",
 	HandlerType: (*BlobServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -164,12 +132,8 @@ var BlobService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _BlobService_CreateBlob_Handler,
 		},
 		{
-			MethodName: "GetBlob",
-			Handler:    _BlobService_GetBlob_Handler,
-		},
-		{
-			MethodName: "GetBlobURL",
-			Handler:    _BlobService_GetBlobURL_Handler,
+			MethodName: "DeleteBlob",
+			Handler:    _BlobService_DeleteBlob_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -19,4 +19,4 @@ function genProto {
 genProto auth
 genProto account
 genProto page
-genProto blob 1
+genProto blob

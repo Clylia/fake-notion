@@ -20,5 +20,6 @@ runall:
 	go run ./auth/main.go \
 	| go run ./account/main.go \
 	| go run ./page/main.go \
+	| go run ./blob/main.go \
 	| go run ./gateway/main.go
 
