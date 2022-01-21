@@ -54,7 +54,7 @@ func TestPageLifecycle(t *testing.T) {
 		{
 			name: "add_page_should_success",
 			op: func() error {
-				p, err := m.CreatePage(context.Background(), objid.ToAccountID(accountID), &page)
+				p, err := m.CreatePage(context.Background(), objid.ToAccountID(accountID), page.Blocks)
 				if err != nil {
 					return err
 				}
@@ -92,6 +92,24 @@ func TestPageLifecycle(t *testing.T) {
 					if blocks[i].HTML != p.Blocks[i].Html {
 						return fmt.Errorf("expected update page block HTML has %v but got %v", blocks[i].HTML, p.Blocks[i].Html)
 					}
+				}
+				return nil
+			},
+			wantErr: false,
+		},
+		{
+			name: "gets_pages_should_success",
+			op: func() error {
+				_, err := m.CreatePage(context.Background(), objid.ToAccountID(accountID), page.Blocks)
+				if err != nil {
+					return err
+				}
+				pages, err := m.GetPages(c, objid.ToAccountID(accountID))
+				if err != nil {
+					return err
+				}
+				if len(pages) != 2 {
+					return fmt.Errorf("expected page has 2 but got %d", len(pages))
 				}
 				return nil
 			},

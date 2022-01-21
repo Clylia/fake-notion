@@ -11,6 +11,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/namsral/flag v1.7.4-pre
+	github.com/pkg/errors v0.9.1
 	go.mongodb.org/mongo-driver v1.8.2
 	go.uber.org/zap v1.20.0
 	google.golang.org/grpc v1.43.0
@@ -46,7 +47,6 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect

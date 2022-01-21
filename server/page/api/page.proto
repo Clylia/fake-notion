@@ -30,7 +30,7 @@ message GetPagesResponse {
 
 message CreatePageRequest {
     string id = 1;
-    PageEmtity page = 2;
+    repeated BlockEmtity blocks = 2;
 }
 
 message UpdatePageRequest {

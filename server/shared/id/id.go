@@ -13,3 +13,10 @@ type PageID string
 func (p PageID) String() string {
 	return string(p)
 }
+
+// BlockID defines block id object.
+type BlockID string
+
+func (b BlockID) String() string {
+	return string(b)
+}

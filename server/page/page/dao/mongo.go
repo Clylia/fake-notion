@@ -8,6 +8,7 @@ import (
 	mgutil "notion/shared/mongo"
 	"notion/shared/mongo/objid"
 
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -50,21 +51,23 @@ type BlockEmtity struct {
 }
 
 // CreatePage creates a page.
-func (m *Mongo) CreatePage(c context.Context, aid id.AccountID, page *PageRecord) (*pagepb.PageEmtity, error) {
+func (m *Mongo) CreatePage(c context.Context, aid id.AccountID, blocks []*BlockEmtity) (*pagepb.PageEmtity, error) {
 	objAID, err := objid.FromID(aid)
 	if err != nil {
 		return nil, fmt.Errorf("invalid account id[%v]: %w", aid, err)
 	}
+	var page PageRecord
+	page.Blocks = blocks
 	page.CreatorID = objAID
 	page.ID = mgutil.NewObjID()
 	now := mgutil.UpdatedAt()
 	page.CreatedAt = now
 	page.UpdatedAt = now
-	_, err = m.col.InsertOne(c, page)
+	_, err = m.col.InsertOne(c, &page)
 	if err != nil {
 		return nil, err
 	}
-	return convertPageEmtity(page), err
+	return convertPageEmtity(&page), err
 }
 
 // GetPage gets a page.
@@ -82,6 +85,31 @@ func (m *Mongo) GetPage(c context.Context, pid id.PageID, aid id.AccountID) (*pa
 		mgutil.IDFieldName: objPID,
 		creatorIDField:     objAID,
 	}))
+}
+
+// GetPages gets pages.
+func (m *Mongo) GetPages(c context.Context, aid id.AccountID) ([]*pagepb.PageEmtity, error) {
+	objAID, err := objid.FromID(aid)
+	if err != nil {
+		return nil, fmt.Errorf("invalid account id[%v]: %w", aid, err)
+	}
+	cur, err := m.col.Find(c, bson.M{
+		creatorIDField: objAID,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("account[%v] cannot find page", aid))
+	}
+
+	var pages []*pagepb.PageEmtity
+	for cur.Next(c) {
+		var page PageRecord
+		err = cur.Decode(&page)
+		if err != nil {
+			return nil, errors.Wrap(err, "cannot decode page")
+		}
+		pages = append(pages, convertPageEmtity(&page))
+	}
+	return pages, nil
 }
 
 // UpdatePage updates a page.
@@ -150,36 +178,15 @@ func convertPageEmtity(pr *PageRecord) *pagepb.PageEmtity {
 	var page pagepb.PageEmtity
 	page.Id = pr.ID.Hex()
 
-	var blocks []*pagepb.BlockEmtity
 	for _, b := range pr.Blocks {
 		var block pagepb.BlockEmtity
 		block.Id = b.ID.Hex()
 		block.Html = b.HTML
 		block.Tag = b.Tag
 		block.ImageUrl = b.ImageURL
-		blocks = append(blocks, &block)
+		page.Blocks = append(page.Blocks, &block)
 	}
-	page.Blocks = blocks
 	page.CreatedAt = int32(pr.CreatedAt)
 	page.UpdatedAt = int32(pr.UpdatedAt)
 	return &page
-}
-
-// ConvertPageRecord convert to page record for insert mongo DB.
-func ConvertPageRecord(page *pagepb.PageEmtity) *PageRecord {
-	var blocks []*BlockEmtity
-	for _, b := range page.Blocks {
-		var block BlockEmtity
-		block.ID = mgutil.NewObjID()
-		block.HTML = b.Html
-		block.Tag = b.Tag
-		// TODO: image should upload to image service
-		block.ImageURL = b.ImageUrl
-		blocks = append(blocks, &block)
-	}
-	p := PageRecord{
-		Blocks: blocks,
-	}
-
-	return &p
 }
