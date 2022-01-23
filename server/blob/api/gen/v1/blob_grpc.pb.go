@@ -23,7 +23,6 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BlobServiceClient interface {
 	CreateBlob(ctx context.Context, in *CreateBlobRequest, opts ...grpc.CallOption) (*CreateBlobResponse, error)
-	DeleteBlob(ctx context.Context, in *DeleteBlobRequest, opts ...grpc.CallOption) (*DeleteBlobResponse, error)
 }
 
 type blobServiceClient struct {
@@ -43,21 +42,11 @@ func (c *blobServiceClient) CreateBlob(ctx context.Context, in *CreateBlobReques
 	return out, nil
 }
 
-func (c *blobServiceClient) DeleteBlob(ctx context.Context, in *DeleteBlobRequest, opts ...grpc.CallOption) (*DeleteBlobResponse, error) {
-	out := new(DeleteBlobResponse)
-	err := c.cc.Invoke(ctx, "/blob.v1.BlobService/DeleteBlob", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // BlobServiceServer is the server API for BlobService service.
 // All implementations must embed UnimplementedBlobServiceServer
 // for forward compatibility
 type BlobServiceServer interface {
 	CreateBlob(context.Context, *CreateBlobRequest) (*CreateBlobResponse, error)
-	DeleteBlob(context.Context, *DeleteBlobRequest) (*DeleteBlobResponse, error)
 	mustEmbedUnimplementedBlobServiceServer()
 }
 
@@ -67,9 +56,6 @@ type UnimplementedBlobServiceServer struct {
 
 func (UnimplementedBlobServiceServer) CreateBlob(context.Context, *CreateBlobRequest) (*CreateBlobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBlob not implemented")
-}
-func (UnimplementedBlobServiceServer) DeleteBlob(context.Context, *DeleteBlobRequest) (*DeleteBlobResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteBlob not implemented")
 }
 func (UnimplementedBlobServiceServer) mustEmbedUnimplementedBlobServiceServer() {}
 
@@ -102,24 +88,6 @@ func _BlobService_CreateBlob_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BlobService_DeleteBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteBlobRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BlobServiceServer).DeleteBlob(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/blob.v1.BlobService/DeleteBlob",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BlobServiceServer).DeleteBlob(ctx, req.(*DeleteBlobRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // BlobService_ServiceDesc is the grpc.ServiceDesc for BlobService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -130,10 +98,6 @@ var BlobService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateBlob",
 			Handler:    _BlobService_CreateBlob_Handler,
-		},
-		{
-			MethodName: "DeleteBlob",
-			Handler:    _BlobService_DeleteBlob_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -12,6 +12,7 @@ require (
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/namsral/flag v1.7.4-pre
 	github.com/pkg/errors v0.9.1
+	github.com/tencentyun/cos-go-sdk-v5 v0.7.33
 	go.mongodb.org/mongo-driver v1.8.2
 	go.uber.org/zap v1.20.0
 	google.golang.org/grpc v1.43.0
@@ -33,6 +34,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -44,6 +46,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
+	github.com/mozillazg/go-httpheader v0.2.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect

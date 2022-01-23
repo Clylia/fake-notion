@@ -5,12 +5,4 @@ http:
   rules:
     - selector: blob.v1.BlobService.CreateBlob
       post: /v1/images
-      parameters:
-        - name: page_id
-          urlQueryParameter: page_id
       body: "*"
-    - selector: blob.v1.BlobService.DeleteBlob
-      delete: /v1/images
-      parameters:
-        - name: page_id
-          urlQueryParameter: page_id

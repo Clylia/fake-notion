@@ -1,26 +1,18 @@
 syntax = "proto3";
 package blob.v1;
+
+
 option go_package="notion/blob/api/gen/v1;blobpb";
 
 message CreateBlobRequest {
     string page_id = 1;
-    string upload_url = 2;
+    int32 upload_url_timeout_sec = 2;
 }
 
 message CreateBlobResponse {
-    string page_id = 1;
     string upload_url = 2;
-}
-
-message DeleteBlobRequest {
-    string page_id = 1;
-    string upload_url = 2;
-}
-
-message DeleteBlobResponse {
 }
 
 service BlobService {
     rpc CreateBlob (CreateBlobRequest) returns (CreateBlobResponse);
-    rpc DeleteBlob (DeleteBlobRequest) returns (DeleteBlobResponse);
 }

@@ -31,6 +31,7 @@ var refreshKey = flag.String("refresh_key",
 
 func main() {
 	flag.Parse()
+
 	logger, err := server.NewZapLogger()
 	if err != nil {
 		log.Fatalf("cannot create logger: %v", err)
@@ -50,7 +51,6 @@ func main() {
 	if err != nil {
 		logger.Fatal("cannot parse private key", zap.Error(err))
 	}
-
 	logger.Sugar().Fatal(server.RunGRPCServer(&server.GRPCConfig{
 		Name: "auth",
 		Addr: *addr,
@@ -67,4 +67,5 @@ func main() {
 		},
 		Logger: logger,
 	}))
+
 }

@@ -29,6 +29,7 @@ var blobAddr = flag.String("blob_addr", "localhost:8084", "address for blob serv
 
 func main() {
 	flag.Parse()
+
 	logger, err := server.NewZapLogger()
 	if err != nil {
 		log.Fatalf("cannot create zap logger: %v", err)
@@ -93,7 +94,10 @@ func main() {
 			logger.Sugar().Fatalf("cannot register service %s: %v", s.name, err)
 		}
 	}
-
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
+	})
+	http.Handle("/", mux)
 	logger.Sugar().Infof("grpc gateway started at %s", *addr)
 	logger.Sugar().Fatal(http.ListenAndServe(*addr, mux))
 }

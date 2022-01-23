@@ -21,6 +21,7 @@ type GRPCConfig struct {
 // RunGRPCServer runs a grpc server.
 func RunGRPCServer(c *GRPCConfig) error {
 	nameField := zap.String("name", c.Name)
+	addrField := zap.String("addr", c.Addr)
 	lis, err := net.Listen("tcp", c.Addr)
 	if err != nil {
 		c.Logger.Fatal("cannot listen", nameField, zap.Error(err))
@@ -37,6 +38,6 @@ func RunGRPCServer(c *GRPCConfig) error {
 
 	s := grpc.NewServer(opts...)
 	c.RegisterFunc(s)
-	c.Logger.Info("server started", nameField, zap.String("addr", c.Addr))
+	c.Logger.Info("server started", nameField, addrField)
 	return s.Serve(lis)
 }
