@@ -2,13 +2,23 @@ package main
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/mail"
+	"os"
+
+	"github.com/namsral/flag"
 
 	"github.com/matcornic/hermes/v2"
 	"gopkg.in/gomail.v2"
 )
 
+var addr string
+
 func main() {
+	flag.StringVar(&addr, "addr", "unkown", "xxxx")
+	flag.Parse()
+	fmt.Println(addr)
+	fmt.Println(os.Getenv("cos_addr"))
 	h := hermes.Hermes{
 		Product: hermes.Product{
 			Name: "FakeNotion",

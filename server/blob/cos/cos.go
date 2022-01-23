@@ -16,6 +16,7 @@ type Service struct {
 	client *cos.Client
 	secID  string
 	secKey string
+	addr   string
 }
 
 // NewService creates a cos service.
@@ -33,6 +34,7 @@ func NewService(addr, secID, secKey string) (*Service, error) {
 			}}),
 		secID:  secID,
 		secKey: secKey,
+		addr:   addr,
 	}, nil
 }
 
@@ -62,4 +64,9 @@ func (s *Service) Get(c context.Context, path string) (io.ReadCloser, error) {
 	}
 
 	return b, nil
+}
+
+// GetURL gets access url.
+func (s *Service) GetURL(c context.Context, path string) (string, error) {
+	return "", nil
 }

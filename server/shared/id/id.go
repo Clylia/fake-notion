@@ -20,3 +20,10 @@ type BlockID string
 func (b BlockID) String() string {
 	return string(b)
 }
+
+// BlobID defines blob id object.
+type BlobID string
+
+func (b BlobID) String() string {
+	return string(b)
+}

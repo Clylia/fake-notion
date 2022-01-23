@@ -23,6 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BlobServiceClient interface {
 	CreateBlob(ctx context.Context, in *CreateBlobRequest, opts ...grpc.CallOption) (*CreateBlobResponse, error)
+	GetBlob(ctx context.Context, in *GetBlobRequest, opts ...grpc.CallOption) (*GetBlobResponse, error)
+	GetBlobURL(ctx context.Context, in *GetBlobURLRequest, opts ...grpc.CallOption) (*GetBlobURLResponse, error)
 }
 
 type blobServiceClient struct {
@@ -42,11 +44,31 @@ func (c *blobServiceClient) CreateBlob(ctx context.Context, in *CreateBlobReques
 	return out, nil
 }
 
+func (c *blobServiceClient) GetBlob(ctx context.Context, in *GetBlobRequest, opts ...grpc.CallOption) (*GetBlobResponse, error) {
+	out := new(GetBlobResponse)
+	err := c.cc.Invoke(ctx, "/blob.v1.BlobService/GetBlob", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blobServiceClient) GetBlobURL(ctx context.Context, in *GetBlobURLRequest, opts ...grpc.CallOption) (*GetBlobURLResponse, error) {
+	out := new(GetBlobURLResponse)
+	err := c.cc.Invoke(ctx, "/blob.v1.BlobService/GetBlobURL", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BlobServiceServer is the server API for BlobService service.
 // All implementations must embed UnimplementedBlobServiceServer
 // for forward compatibility
 type BlobServiceServer interface {
 	CreateBlob(context.Context, *CreateBlobRequest) (*CreateBlobResponse, error)
+	GetBlob(context.Context, *GetBlobRequest) (*GetBlobResponse, error)
+	GetBlobURL(context.Context, *GetBlobURLRequest) (*GetBlobURLResponse, error)
 	mustEmbedUnimplementedBlobServiceServer()
 }
 
@@ -56,6 +78,12 @@ type UnimplementedBlobServiceServer struct {
 
 func (UnimplementedBlobServiceServer) CreateBlob(context.Context, *CreateBlobRequest) (*CreateBlobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBlob not implemented")
+}
+func (UnimplementedBlobServiceServer) GetBlob(context.Context, *GetBlobRequest) (*GetBlobResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBlob not implemented")
+}
+func (UnimplementedBlobServiceServer) GetBlobURL(context.Context, *GetBlobURLRequest) (*GetBlobURLResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBlobURL not implemented")
 }
 func (UnimplementedBlobServiceServer) mustEmbedUnimplementedBlobServiceServer() {}
 
@@ -88,6 +116,42 @@ func _BlobService_CreateBlob_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlobService_GetBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBlobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlobServiceServer).GetBlob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/blob.v1.BlobService/GetBlob",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlobServiceServer).GetBlob(ctx, req.(*GetBlobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlobService_GetBlobURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBlobURLRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlobServiceServer).GetBlobURL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/blob.v1.BlobService/GetBlobURL",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlobServiceServer).GetBlobURL(ctx, req.(*GetBlobURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BlobService_ServiceDesc is the grpc.ServiceDesc for BlobService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +162,14 @@ var BlobService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateBlob",
 			Handler:    _BlobService_CreateBlob_Handler,
+		},
+		{
+			MethodName: "GetBlob",
+			Handler:    _BlobService_GetBlob_Handler,
+		},
+		{
+			MethodName: "GetBlobURL",
+			Handler:    _BlobService_GetBlobURL_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

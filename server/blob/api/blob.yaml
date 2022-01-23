@@ -6,3 +6,5 @@ http:
     - selector: blob.v1.BlobService.CreateBlob
       post: /v1/images
       body: "*"
+    - selector: blob.v1.BlobService.GetBlobURL
+      get: /v1/images/{id}
